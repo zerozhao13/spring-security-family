@@ -1,0 +1,13 @@
+server:
+  port: 8090
+spring:
+  datasource:
+    name: phoenix
+      driver-class-name: org.mariadb.jdbc.Driver
+      url: jdbc:mariadb://127.0.0.1:3306/phoenix_user?useUnicode=true&characterEncoding=utf8mb4&allowMultiQueries=true
+      username: phoenix_user
+      password: phoenix_user
+      type: com.zaxxer.hikari.HikariDataSource
+      hikari:
+        maximum-pool-size: 10
+        minimum-idle: 5
