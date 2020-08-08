@@ -1,16 +1,20 @@
 package com.phoenix.security.interceptor;
 
-import com.phoenix.security.dto.UserInfoDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.phoenix.security.dto.UserClaim;
 import com.phoenix.security.entity.PayLoad;
 import com.phoenix.security.property.RsaKeyProperties;
 import com.phoenix.security.service.permission.impl.PermissionServiceImpl;
 import com.phoenix.security.util.JwtUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -18,10 +22,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class PhoenixSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
-
-  private RsaKeyProperties rsaKeyProperties;
-  private PermissionServiceImpl permissionService;
+  @Autowired private RsaKeyProperties rsaKeyProperties;
+  @Autowired private PermissionServiceImpl permissionService;
 
   @Override
   public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
@@ -29,12 +33,16 @@ public class PhoenixSecurityMetadataSource implements FilterInvocationSecurityMe
     FilterInvocation filterInvocation = (FilterInvocation) object;
     HttpServletRequest request = filterInvocation.getRequest();
     String token = request.getHeader("Authorization");
+    //TODO: 这里为了方便登录，没有token默认不拦截，其实应该将没有token与白名单一起校验。
     if (null == token || !token.startsWith("Bearer ")) {
       return null;
     }
-    UsernamePasswordAuthenticationToken upt = getUserAuthToken(token.replace("Bearer ", ""));
-    List<ConfigAttribute> attrs = getConfigAttributeList(request.getRequestURI());
-    return attrs;
+    try {
+      UsernamePasswordAuthenticationToken upt = getUserAuthToken(token.replace("Bearer ", ""));
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    return getConfigAttributeList(request.getRequestURI());
   }
 
   /**
@@ -51,11 +59,9 @@ public class PhoenixSecurityMetadataSource implements FilterInvocationSecurityMe
       cfgList.add(new SecurityConfig("ROLE_DENIED"));
       return cfgList;
     }
-    List<ConfigAttribute> cfgList =
-        ridList.stream()
-            .map(rid -> new SecurityConfig(rid.toString()))
-            .collect(Collectors.toList());
-    return cfgList;
+    return ridList.stream()
+        .map(rid -> new SecurityConfig(rid.toString()))
+        .collect(Collectors.toList());
   }
 
   /**
@@ -72,15 +78,21 @@ public class PhoenixSecurityMetadataSource implements FilterInvocationSecurityMe
    * @param token
    * @return
    */
-  private UsernamePasswordAuthenticationToken getUserAuthToken(String token) {
-    PayLoad<UserInfoDto> payload =
-        JwtUtils.getInfoFromToken(token, rsaKeyProperties.getPublicKey(), UserInfoDto.class);
-    UserInfoDto userInfo = payload.getUserInfoDto();
+  private UsernamePasswordAuthenticationToken getUserAuthToken(String token)
+      throws JsonProcessingException {
+    PayLoad<UserClaim> payload =
+        JwtUtils.getInfoFromToken(token, rsaKeyProperties.getPublicKey(), UserClaim.class);
+    UserClaim userInfo = payload.getUserInfoDto();
     if (null == userInfo) {
       return null;
     }
     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-        new UsernamePasswordAuthenticationToken(userInfo, null, userInfo.getAuthorities());
+        new UsernamePasswordAuthenticationToken(
+            userInfo,
+            null,
+            userInfo.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.toString()))
+                .collect(Collectors.toList()));
     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
     return usernamePasswordAuthenticationToken;
   }

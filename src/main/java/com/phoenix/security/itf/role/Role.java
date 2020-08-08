@@ -8,4 +8,5 @@ public interface Role {
     List<RoleDao> getUserRoles(String openId);
     Long createOrUpdateRole(RoleDao role);
     void createOrUpdateRoles(List<RoleDao> roleList);
+    void createOrUpdateUserRoles(String openId, List<RoleDao> roleList);
 }

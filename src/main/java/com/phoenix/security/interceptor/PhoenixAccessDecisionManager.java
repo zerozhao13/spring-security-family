@@ -5,11 +5,13 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class PhoenixAccessDecisionManager implements AccessDecisionManager {
   @Override
   public void decide(
@@ -31,20 +33,20 @@ public class PhoenixAccessDecisionManager implements AccessDecisionManager {
     if (null == authentication) {
       return false;
     }
-    List<Long> userRidList =
+    List<String> userRidList =
         authentication.getAuthorities().stream()
-            .map(auth -> Long.valueOf(auth.getAuthority()))
+            .map(auth -> auth.getAuthority())
             .distinct()
             .sorted()
             .collect(Collectors.toList());
-    List<Long> uriRidList =
+    List<String> uriRidList =
         configAttributes.stream()
-            .map(configAttribute -> Long.valueOf(configAttribute.getAttribute()))
+            .map(configAttribute -> configAttribute.getAttribute())
             .distinct()
             .sorted()
             .collect(Collectors.toList());
 
-    for (Long userRid : userRidList) {
+    for (String userRid : userRidList) {
       if (uriRidList.contains(userRid)) {
         return true;
       }

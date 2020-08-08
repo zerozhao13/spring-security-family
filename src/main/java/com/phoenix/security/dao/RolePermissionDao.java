@@ -1,9 +1,13 @@
 package com.phoenix.security.dao;
 
-import lombok.Data;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@TableName("role_permission")
 public class RolePermissionDao extends BaseDao {
-    private Long rid;
-    private Long pid;
+  private Long rid;
+  private Long pid;
 }

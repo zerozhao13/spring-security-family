@@ -6,6 +6,7 @@ import com.phoenix.security.dao.RoleDao;
 import com.phoenix.security.dao.UserDao;
 import com.phoenix.security.dao.UserOpenIdDao;
 import com.phoenix.security.dto.BaseUserDto;
+import com.phoenix.security.dto.OpenIdRolesDto;
 import com.phoenix.security.dto.UserInfoDto;
 import com.phoenix.security.enums.UserRespMsg;
 import com.phoenix.security.itf.role.Role;
@@ -41,13 +42,26 @@ public class UserDetailsServiceImpl implements UserDetailsService, PnxUser, Role
   }
 
   @Override
-  public void createOrUpdateRoles(List<RoleDao> roleList) {
+  public void createOrUpdateRoles(List<RoleDao> roleList) {}
 
+  @Override
+  public void createOrUpdateUserRoles(String openId, List<RoleDao> roleList) {}
+
+  public boolean createUserRoles(OpenIdRolesDto openIdRolesDto) {
+    String openId = openIdRolesDto.getOpenId();
+    List<Long> rids = openIdRolesDto.getRids();
+    rids.stream()
+        .map(
+            rid -> {
+              openIdRoleMapper.insert(OpenIdRoleDao.builder().openId(openId).rid(rid).build());
+              return true;
+            });
+    return true;
   }
 
   @Override
   public UserDao getPnxUserByName(String username) {
-    return null;
+    return userMapper.selectOne(new QueryWrapper<UserDao>().eq("username", username));
   }
 
   @Override
@@ -64,7 +78,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, PnxUser, Role
   @Override
   @Cacheable(value = "userInfo", key = "#username")
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    UserDao userDao = userMapper.selectOne(new QueryWrapper<UserDao>().eq("username", username));
+    UserDao userDao = getPnxUserByName(username);
     if (null == userDao) {
       throw new UsernameNotFoundException(UserRespMsg.NOT_EXIST.getMsg());
     }
@@ -72,7 +86,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, PnxUser, Role
         userOpenIdMapper.selectOne(new QueryWrapper<UserOpenIdDao>().eq("uid", userDao.getUid()));
     List<OpenIdRoleDao> openIdRoleDaoList =
         openIdRoleMapper.selectList(
-            new QueryWrapper<OpenIdRoleDao>().eq("openId", userOpenIdDao.getOpenId()));
+            new QueryWrapper<OpenIdRoleDao>().eq("open_id", userOpenIdDao.getOpenId()));
     return new UserInfoDto(userDao, userOpenIdDao, openIdRoleDaoList);
   }
 }

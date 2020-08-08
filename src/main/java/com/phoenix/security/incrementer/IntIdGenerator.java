@@ -16,8 +16,7 @@ public class IntIdGenerator implements IdentifierGenerator {
     public Number nextId(Object entity) {
         String bizKey = entity.getClass().getName();
         MetaObject metaObject = SystemMetaObject.forObject(entity);
-        String name = (String) metaObject.getValue("name");
-        final long id = al.getAndAdd(1);
-        return id;
+        //String name = (String) metaObject.getValue("name");
+        return al.getAndAdd(1);
     }
 }

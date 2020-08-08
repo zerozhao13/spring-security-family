@@ -108,9 +108,11 @@ public class RsaKeyUtil {
   private static void writeFile(String filePath, byte[] keyBytes) throws IOException {
     File dest = new File(filePath);
     if (!dest.exists()) {
-      dest.createNewFile();
+      boolean result = dest.createNewFile();
+      if (result) {
+        keyBytes = Base64.getEncoder().encode(keyBytes);
+        Files.write(dest.toPath(), keyBytes);
+      }
     }
-    keyBytes = Base64.getEncoder().encode(keyBytes);
-    Files.write(dest.toPath(), keyBytes);
   }
 }

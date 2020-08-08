@@ -1,30 +1,36 @@
 package com.phoenix.security.config;
 
+import com.phoenix.security.interceptor.PhoenixAccessDecisionManager;
 import com.phoenix.security.interceptor.PhoenixAuthFailHandler;
 import com.phoenix.security.interceptor.PhoenixAuthSuccessFilter;
-import com.phoenix.security.interceptor.PhoenixPostProcessor;
-import com.phoenix.security.property.RsaKeyProperties;
+import com.phoenix.security.interceptor.PhoenixSecurityMetadataSource;
 import com.phoenix.security.service.user.impl.UserDetailsServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
 @Configuration
-@EnableWebSecurity
+// @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true) // 全局
 public class PhoenixWebConfig extends WebSecurityConfigurerAdapter {
 
-  private UserDetailsServiceImpl userDetailsService;
-  private PhoenixAuthSuccessFilter phoenixAuthSuccessFilter;
-  private PhoenixAuthFailHandler phoenixAuthFailHandler;
-  private RsaKeyProperties rsaKeyProperties;
-  private PhoenixPostProcessor phoenixPostProcessor;
-
-  public PhoenixWebConfig() {
-  }
+  @Autowired private UserDetailsServiceImpl userDetailsService;
+  @Autowired private PhoenixAuthSuccessFilter phoenixAuthSuccessFilter;
+  @Autowired private PhoenixAuthFailHandler phoenixAuthFailHandler;
+  // @Autowired private RsaKeyProperties rsaKeyProperties;
+  // @Autowired
+  // @Resource(name = "PhoenixPostProcessor")
+  // private PhoenixPostProcessor phoenixPostProcessor;
+  @Autowired private PhoenixAccessDecisionManager phoenixAccessDecisionManager;
+  @Autowired private PhoenixSecurityMetadataSource phoenixSecurityMetadataSource;
 
   @Bean
   public BCryptPasswordEncoder passwordEncoder() {
@@ -45,12 +51,29 @@ public class PhoenixWebConfig extends WebSecurityConfigurerAdapter {
         .csrf()
         .disable()
         .authorizeRequests()
-        .antMatchers("login", "signup")
+        .withObjectPostProcessor(
+            new ObjectPostProcessor<FilterSecurityInterceptor>() {
+              @Override
+              public <O extends FilterSecurityInterceptor> O postProcess(O object) {
+                object.setSecurityMetadataSource(phoenixSecurityMetadataSource);
+                object.setAccessDecisionManager(phoenixAccessDecisionManager);
+                return object;
+              }
+            })
+        .antMatchers("/login", "/signup", "/swagger-ui.html", "/v2/api-doc")
         .permitAll()
+        .anyRequest()
+        .authenticated()
         .and()
         .formLogin()
+        //    .loginPage("/login")
+        //    .usernameParameter("username")
+        //    .passwordParameter("password")
         .successHandler(phoenixAuthSuccessFilter)
-        .failureHandler(phoenixAuthFailHandler).withObjectPostProcessor(phoenixPostProcessor);
-        //.addFilter(new JwtAuthenticationFilter(authenticationManager(), rsaKeyProperties));
+        .failureHandler(phoenixAuthFailHandler)
+        .and()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    // .addFilter(new JwtAuthenticationFilter(authenticationManager(), rsaKeyProperties));
   }
 }

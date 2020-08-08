@@ -5,7 +5,7 @@ import com.phoenix.security.dao.PermissionDao;
 import java.util.List;
 
 public interface Permission {
-    List<?> getPermListByRole(String rid);
+    List<?> getPermList();
     Long createOrUpdatePerm(PermissionDao permissionDao);
     List<?> getPermListByUri(String Uri);
 }
