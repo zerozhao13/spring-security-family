@@ -198,3 +198,131 @@ RSA 是目前应用最广泛的数字加密和签名技术，比如国内的支�
 
 带着这样的目标，我们就需要对其有基本的了解（[想要深入了解?](https://docs.spring.io/spring-security/site/docs/5.3.3.BUILD-SNAPSHOT/reference/html5/)）
 
+## 简介
+Spring Security 是一个可以帮助我们做用户认证、鉴权、以及预防一些基础攻击的框架。
+
+因为我们在分享中使用的Spring Security 5，所以需要的JDK版本必须是8以上。
+
+Spring Security的实现是基于其内部的一系列 Filter，我们可以在这些Filter基础上实现一些自己的Filter，来实现我们自定义的认证、鉴权及一些基础防御。
+
+它支持基于Servlet、WebFlux的接口进行权限控制。
+
+## 基本工作流程
+我们先看一个用户在Spring Security的生命周期大概经历哪些过程：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200810134646772.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjI4ODIxOQ==,size_16,color_FFFFFF,t_70)
+
+我们简单解释一下上图：
+Spring Security的核心配置类是 WebSecurityConfigurerAdapter这个抽象类
+这是权限管理启动的入口，我们在实现自己的应用时需要自己去实现这个类，里面根据我们自己的需求去做一些配置。
+
+进入这个过程之后，我们的系统会经历一系列的Filter来层层过滤请求，保障我们的系统安全。
+
+因此理解一些主要Filter对于理解后面的DEMO会有所帮助。
+
+### SecurityFilterChain
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200810142029920.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjI4ODIxOQ==,size_16,color_FFFFFF,t_70)
+
+### Security Filters
+
+ - ChannelProcessingFilter
+ - ConcurrentSessionFilter
+   
+   WebAsyncManagerIntegrationFilter
+   
+   SecurityContextPersistenceFilter
+   
+   HeaderWriterFilter
+   
+   CorsFilter
+   
+   CsrfFilter
+   
+   LogoutFilter
+   
+   OAuth2AuthorizationRequestRedirectFilter
+   
+   Saml2WebSsoAuthenticationRequestFilter
+   
+   X509AuthenticationFilter
+   
+   AbstractPreAuthenticatedProcessingFilter
+   
+   CasAuthenticationFilter
+   
+   OAuth2LoginAuthenticationFilter
+   
+   Saml2WebSsoAuthenticationFilter
+   
+   UsernamePasswordAuthenticationFilter
+   
+   ConcurrentSessionFilter
+   
+   OpenIDAuthenticationFilter
+   
+   DefaultLoginPageGeneratingFilter
+   
+   DefaultLogoutPageGeneratingFilter
+   
+   DigestAuthenticationFilter
+   
+   BearerTokenAuthenticationFilter
+   
+   BasicAuthenticationFilter
+   
+   RequestCacheAwareFilter
+   
+   SecurityContextHolderAwareRequestFilter
+   
+   JaasApiIntegrationFilter
+   
+   RememberMeAuthenticationFilter
+   
+   AnonymousAuthenticationFilter
+   
+   OAuth2AuthorizationCodeGrantFilter
+   
+   SessionManagementFilter
+   
+   ExceptionTranslationFilter
+   
+   FilterSecurityInterceptor
+   
+   SwitchUserFilter
+
+### 处理异常
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200810142925794.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjI4ODIxOQ==,size_16,color_FFFFFF,t_70)
+
+### 用户认证
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200810143042168.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjI4ODIxOQ==,size_16,color_FFFFFF,t_70)
+
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200810143057877.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjI4ODIxOQ==,size_16,color_FFFFFF,t_70)
+
+### UserDetails
+
+### UserDetailsService
+
+### 基于用户名密码验证
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200810144000404.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjI4ODIxOQ==,size_16,color_FFFFFF,t_70)
+
+上图的大致流程如下：
+
+1. AbstractAuthenticationProcessingFilter#doFilter()
+2. UsernamePasswordAuthenticationFilter#attemptAuthentication()
+3. ProviderManager#authenticate()
+4. AbstractUserDetailsAuthenticationProvider#authenticate()
+5. DaoAuthenticationProvider#retrieveUser()
+6. UserDetailsService#loadUserByUsername()
+
+### AuthenticationProvider
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200810143302863.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjI4ODIxOQ==,size_16,color_FFFFFF,t_70)
+
+### 鉴权
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200810143631497.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjI4ODIxOQ==,size_16,color_FFFFFF,t_70)
