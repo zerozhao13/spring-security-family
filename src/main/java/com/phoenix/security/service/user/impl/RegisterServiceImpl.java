@@ -38,17 +38,24 @@ public class RegisterServiceImpl implements PnxUser, Role {
     return null;
   }
 
+  /**
+   * 创建新用户，如此用户名已存在则提示用户已存在
+   *
+   * @param user
+   * @return
+   */
   @Override
   @Transactional
   public Long createOrUpdateUser(BaseUserDto user) {
     RegisterDto registerDto = (RegisterDto) user;
-    UserDao userDao = getPnxUserByName(registerDto.getUsername());
+    String username = registerDto.getUsername().trim();
+    UserDao userDao = getPnxUserByName(username);
     if (null != userDao) {
       throw new RuntimeException("这个世界不能存在分身，请重新设置用户名。");
     }
     userDao = new UserDao();
-    userDao.setUsername(registerDto.getUsername());
-    userDao.setPassword(new BCryptPasswordEncoder().encode(registerDto.getPassword()));
+    userDao.setUsername(username);
+    userDao.setPassword(new BCryptPasswordEncoder().encode(registerDto.getPassword().trim()));
     userMapper.insert(userDao);
     String openid = createOpenId(userDao.getUid(), registerDto.getAppId());
     createOrUpdateUserRoles(openid, getRoleDaos(registerDto.getRoleDtos()));

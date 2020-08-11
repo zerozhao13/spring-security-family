@@ -47,6 +47,12 @@ public class UserDetailsServiceImpl implements UserDetailsService, PnxUser, Role
   @Override
   public void createOrUpdateUserRoles(String openId, List<RoleDao> roleList) {}
 
+  /**
+   * 为用户添加角色
+   * @param openIdRolesDto
+   * @return
+   */
+  //TODO: 该方法未对插入结果做校验，未对已存在数据做校验
   public boolean createUserRoles(OpenIdRolesDto openIdRolesDto) {
     String openId = openIdRolesDto.getOpenId();
     List<Long> rids = openIdRolesDto.getRids();
@@ -75,6 +81,12 @@ public class UserDetailsServiceImpl implements UserDetailsService, PnxUser, Role
     return null;
   }
 
+  /**
+   * 根据用户名返回UserDetails的实现类对象UserInfoDto
+   * @param username
+   * @return
+   * @throws UsernameNotFoundException
+   */
   @Override
   @Cacheable(value = "userInfo", key = "#username")
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

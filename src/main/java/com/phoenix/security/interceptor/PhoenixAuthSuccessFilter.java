@@ -20,6 +20,15 @@ public class PhoenixAuthSuccessFilter implements AuthenticationSuccessHandler {
   @Autowired private UserDetailsServiceImpl userDetailsService;
   @Autowired private RsaKeyProperties rsaKeyProperties;
 
+  /**
+   * 登录成功后，从Authentication中取出登录成功的UserInfoDto并转化为 JWT payload的自定义claim，生成token，并在返回头中返回token。
+   *
+   * @param request
+   * @param response
+   * @param authentication
+   * @throws IOException
+   * @throws ServletException
+   */
   @Override
   public void onAuthenticationSuccess(
       HttpServletRequest request, HttpServletResponse response, Authentication authentication)
@@ -36,11 +45,14 @@ public class PhoenixAuthSuccessFilter implements AuthenticationSuccessHandler {
     response.addHeader("Authorization", "Bearer " + token);
   }
 
+  /**
+   * 根据authUser数据返回token所需用户数据
+   * @param authUser
+   * @return
+   */
   private UserClaim getClaimUserInfo(UserInfoDto authUser) {
-    UserClaim claims = new UserClaim();
-    claims.setOpenId(authUser.getOpenId());
-    claims.setUsername(authUser.getUser().getUsername());
-    claims.setRoles(authUser.getRoles());
+    UserClaim claims =
+        new UserClaim(authUser.getOpenId(), authUser.getUser().getUsername(), authUser.getRoles());
     return claims;
   }
 }

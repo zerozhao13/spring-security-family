@@ -11,6 +11,15 @@ import java.io.IOException;
 
 @Component
 public class PhoenixAuthFailHandler implements AuthenticationFailureHandler {
+  /**
+   * 登录失败，返回未认证错误
+   *
+   * @param request
+   * @param response
+   * @param exception
+   * @throws IOException
+   * @throws ServletException
+   */
   @Override
   public void onAuthenticationFailure(
       HttpServletRequest request, HttpServletResponse response, AuthenticationException exception)

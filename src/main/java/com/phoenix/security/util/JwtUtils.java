@@ -2,7 +2,6 @@ package com.phoenix.security.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.phoenix.security.dto.UserInfoDto;
 import com.phoenix.security.entity.PayLoad;
 import io.jsonwebtoken.*;
 
@@ -14,7 +13,6 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
 
-/** 生成token以及校验token相关方法 */
 public class JwtUtils {
 
   private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -69,7 +67,8 @@ public class JwtUtils {
     Claims body = claimsJws.getBody();
     PayLoad<T> claims = new PayLoad<>();
     claims.setId(body.getId());
-    claims.setUserInfoDto(objectMapper.readValue(body.get(JWT_PAYLOAD_USERINFO).toString(), userType));
+    claims.setUserInfoDto(
+        objectMapper.readValue(body.get(JWT_PAYLOAD_USERINFO).toString(), userType));
     claims.setExpiration(body.getExpiration());
     return claims;
   }

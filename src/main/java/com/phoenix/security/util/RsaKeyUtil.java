@@ -13,7 +13,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-/** @author 黑马程序员 */
 public class RsaKeyUtil {
 
   private static final int DEFAULT_KEY_SIZE = 2048;
@@ -105,6 +104,13 @@ public class RsaKeyUtil {
     return Files.readAllBytes(new File(fileName).toPath());
   }
 
+  /**
+   * 将RSA密钥对写入文件
+   *
+   * @param filePath
+   * @param keyBytes
+   * @throws IOException
+   */
   private static void writeFile(String filePath, byte[] keyBytes) throws IOException {
     File dest = new File(filePath);
     if (!dest.exists()) {
