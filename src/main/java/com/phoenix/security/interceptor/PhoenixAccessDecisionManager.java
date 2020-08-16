@@ -13,6 +13,15 @@ import java.util.stream.Collectors;
 
 @Component
 public class PhoenixAccessDecisionManager implements AccessDecisionManager {
+  /**
+   * 判断用户是否由权限进行资源访问 如果权限不足则抛出AccessDeniedException
+   *
+   * @param authentication
+   * @param object
+   * @param configAttributes
+   * @throws AccessDeniedException
+   * @throws InsufficientAuthenticationException
+   */
   @Override
   public void decide(
       Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes)
@@ -24,6 +33,8 @@ public class PhoenixAccessDecisionManager implements AccessDecisionManager {
 
   /**
    * 根据auth里取出来的用户role与配置中的uri对应roles进行匹配
+   * authentication与configAttributes中数据来自于PhoenixSecurityMetadataSource
+   *
    * @param authentication
    * @param configAttributes
    * @return

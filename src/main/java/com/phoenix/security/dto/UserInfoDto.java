@@ -43,6 +43,10 @@ public class UserInfoDto implements UserDetails {
     return roleDaoList.stream().map(OpenIdRoleDao::getRid).collect(Collectors.toList());
   }
 
+  /**
+   * 返回权限的集合，是这里非常关键的一步。
+   * @return
+   */
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return this.roles.stream()
