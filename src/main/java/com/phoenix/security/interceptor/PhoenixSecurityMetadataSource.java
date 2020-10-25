@@ -1,3 +1,4 @@
+/*
 package com.phoenix.security.interceptor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -45,10 +46,12 @@ public class PhoenixSecurityMetadataSource implements FilterInvocationSecurityMe
     return getConfigAttributeList(request.getRequestURI());
   }
 
-  /**
+  */
+/**
    * @param requestURI
    * @return
-   */
+   *//*
+
   private List<ConfigAttribute> getConfigAttributeList(String requestURI) {
     if (isMatchWhiteList(requestURI)) {
       return null;
@@ -64,20 +67,24 @@ public class PhoenixSecurityMetadataSource implements FilterInvocationSecurityMe
         .collect(Collectors.toList());
   }
 
-  /**
+  */
+/**
    * check whether this path in the white list.
    *
    * @param requestURI
    * @return
-   */
+   *//*
+
   private boolean isMatchWhiteList(String requestURI) {
     return false;
   }
 
-  /**
+  */
+/**
    * @param token
    * @return
-   */
+   *//*
+
   private UsernamePasswordAuthenticationToken getUserAuthToken(String token)
       throws JsonProcessingException {
     PayLoad<UserClaim> payload =
@@ -107,3 +114,4 @@ public class PhoenixSecurityMetadataSource implements FilterInvocationSecurityMe
     return FilterInvocation.class.isAssignableFrom(clazz);
   }
 }
+*/

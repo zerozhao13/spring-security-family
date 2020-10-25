@@ -742,3 +742,8 @@ public class PhoenixAccessDecisionManager implements AccessDecisionManager {
 分享的视频讲解：
 [基础概念](https://ke.qq.com/webcourse/index.html#cid=2727217&term_id=102834328&lite=1&from=800021724&taid=34278965&vid=5285890806304440835)
 [代码讲解](https://ke.qq.com/webcourse/index.html#cid=2729071&term_id=102836182&lite=1&from=800021724&taid=34294926&vid=5285890806340237073)
+
+# 基于Spring Cloud Gateway
+
+基于Spring Cloud Gateway的关键就在于基于Webflux，这与之前基于Servlet的实现有了不少区别，接下来我们结合一个简单的DEMO来进行一些思路的讲解。
+

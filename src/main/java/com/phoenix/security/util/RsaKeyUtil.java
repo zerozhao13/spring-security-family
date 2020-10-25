@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class RsaKeyUtil {
 
-  private static final int DEFAULT_KEY_SIZE = 2048;
+  private static final int DEFAULT_KEY_SIZE = 256;
   private static final String KEY_INS = "RSA";
 
   /**

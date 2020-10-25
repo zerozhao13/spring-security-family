@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -32,7 +31,7 @@ public class PermissionController {
   }
 
   @PostMapping("/create")
-  RespDto<PermissionDao> createPermission(HttpServletRequest req, PermissionDao perm) {
+  RespDto<PermissionDao> createPermission(PermissionDao perm) {
     //TODO: 这里有一个问题，这类数据需要谁做了操作，而这个谁需要来自于登录用户，那么这个数据从哪里来呢？从token
     //UserInfoDto userInfoDto = req.getHeader("Authorization");
     return RespDto.builder()
@@ -45,7 +44,7 @@ public class PermissionController {
   }
 
   @PostMapping("/roles/create")
-  RespDto<Boolean> createPermRolesRelationship(HttpServletRequest req, PidRidsDto pidRidsDto) {
+  RespDto<Boolean> createPermRolesRelationship(PidRidsDto pidRidsDto) {
     return RespDto.builder()
             .appid("1")
             .serial("111111")

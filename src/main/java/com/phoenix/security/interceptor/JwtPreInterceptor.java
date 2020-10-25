@@ -1,3 +1,4 @@
+/*
 package com.phoenix.security.interceptor;
 
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -14,3 +15,4 @@ public class JwtPreInterceptor extends HandlerInterceptorAdapter {
         return result;
     }
 }
+*/

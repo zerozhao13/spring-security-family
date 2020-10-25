@@ -3,8 +3,6 @@ package com.phoenix.security.property;
 import com.phoenix.security.util.RsaKeyUtil;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
